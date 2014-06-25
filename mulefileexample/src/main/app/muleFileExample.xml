@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.3.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
+
+<spring:beans>
+<spring:bean id="filePoller" class="com.javaroots.FilePollerComponent">
+<spring:property name="pollDir" value="E:/fileTest"></spring:property>
+<spring:property name="numberOfFiles" value="3"></spring:property>
+
+
+</spring:bean>
+
+</spring:beans>
+
+<flow name="fileInboundTestFlow" doc:name="fileInboundTestFlow" processingStrategy="synchronous">
+    	<poll frequency="200000">
+    		<component doc:name="File Poller">
+    			<spring-object bean="filePoller"/>
+    		</component>
+    	</poll>
+    	<logger message="Size of payload is : #[message.payload.size()]" level="INFO"/>
+    	  <choice doc:name="Choice"> 
+                <when expression="#[message.payload.size() &gt; 0]"> 
+    			<request-reply >
+						<vm:outbound-endpoint path="out" >
+								<collection-splitter />
+						</vm:outbound-endpoint>
+						<vm:inbound-endpoint path="response">
+							<message-properties-transformer>
+								<add-message-property key="MULE_CORRELATION_GROUP_SIZE" value="3" />
+							</message-properties-transformer>
+						<collection-aggregator/>
+						</vm:inbound-endpoint>						
+				</request-reply>
+			</when>
+			<otherwise>
+		 		<logger />
+			</otherwise>
+		</choice>
+    </flow>
+    
+    <flow name="processor" >
+    	<vm:inbound-endpoint path="out"/>
+     	<component class="com.javaroots.SleepComponent" doc:name="sleep"/>
+     	<vm:outbound-endpoint path="response"/>
+    </flow>
+
+</mule>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="muleFileExample">
+    <global-element name="Bean" type="http://www.springframework.org/schema/beans/bean" entity-id="Bean#1">
+        <properties>
+            <property name="id" value="filePoller"/>
+            <property name="name"/>
+            <property name="class" value="com.javaroots.FilePollerComponent"/>
+            <property name="parent"/>
+            <property name="scope"/>
+            <property name="children"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property name="abstract"/>
+            <property name="lazy-init"/>
+            <property name="autowire"/>
+            <property name="depends-on"/>
+            <property name="autowire-candidate"/>
+            <property name="primary"/>
+            <property name="init-method"/>
+            <property name="destroy-method"/>
+            <property name="factory-method"/>
+            <property name="factory-bean"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="auxiliary;wrapIn" value="1"/>
+            <property-collection name="@http://www.springframework.org/schema/beans/property;0">
+                <property name="name" value="pollDir"/>
+                <property name="value" value="E:/fileTest"/>
+                <property name="auxiliary;wrapIn" value="3"/>
+                <property name="auxiliary;index" value="3"/>
+            </property-collection>
+            <property-collection name="@http://www.springframework.org/schema/beans/property;1">
+                <property name="name" value="numberOfFiles"/>
+                <property name="value" value="3"/>
+                <property name="auxiliary;wrapIn" value="4"/>
+                <property name="auxiliary;index" value="4"/>
+            </property-collection>
+        </properties>
+    </global-element>
+    <flow SubFlow="false" name="fileInboundTestFlow" entity-id="78cca42b-9874-4d8d-b1eb-461ac08ec3bd">
+        <properties>
+            <property name="processingStrategy2" value="synchronous"/>
+            <property name="processingStrategy" value="synchronous"/>
+            <property name="auxiliary;index" value="5"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="5"/>
+            <property name="auxiliary;index" value="5"/>
+            <property name="auxiliary;index" value="5"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <multi-source index="6" name="Poll" type="org.mule.tooling.ui.modules.core.endpoint.Poller" entity-id="Poll#1">
+                <properties>
+                    <property name="frequency" value="200000"/>
+                    <property name=";INDEX" value="6"/>
+                </properties>
+                <pattern name="File Poller" type="http://www.mulesoft.org/schema/mule/core/component" entity-id="Java#1">
+                    <properties>
+                        <property name="auxiliary;index" value="7"/>
+                        <property name="auxiliary;index" value="7"/>
+                        <property name="auxiliary;index" value="7"/>
+                        <property name="class"/>
+                        <property name="auxiliary;index" value="7"/>
+                        <property name="auxiliary;index" value="7"/>
+                        <property name="auxiliary;index" value="7"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/core/spring-object;0">
+                            <property name="bean" value="filePoller"/>
+                            <property name="auxiliary;wrapIn" value="8"/>
+                            <property name="auxiliary;index" value="8"/>
+                        </property-collection>
+                    </properties>
+                </pattern>
+            </multi-source>
+            <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#1">
+                <properties>
+                    <property name="message" value="Size of payload is : #[message.payload.size()]"/>
+                    <property name="level" value="INFO"/>
+                    <property name="category"/>
+                    <property name="auxiliary;index" value="9"/>
+                    <property name="auxiliary;index" value="9"/>
+                    <property name="auxiliary;index" value="9"/>
+                </properties>
+            </pattern>
+            <splitter index="10" name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#1">
+                <properties>
+                    <property-collection name="2b64c801-8ae0-45ba-8f38-aef74035e98b">
+                        <property name="choice.otherwise" value="true"/>
+                        <property-collection name="choice.attributes"/>
+                    </property-collection>
+                    <property-collection name="de01bf27-1e6b-4dcf-91d3-c39e79a5ad7c">
+                        <property name="choice.expression" value="#[message.payload.size() &gt; 0]"/>
+                        <property-collection name="choice.attributes">
+                            <property name="expression" value="#[message.payload.size() &gt; 0]"/>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+                <pattern name="Choice" type="org.mule.tooling.ui.modules.core.pattern.cbr" entity-id="Choice#2"/>
+                <compartment entity-id="compartment#1">
+                    <lane hadOnlyOneElement="true" index="12" isChoiceOtherwiseLane="false" entity-id="de01bf27-1e6b-4dcf-91d3-c39e79a5ad7c">
+                        <unknown description="false" index="12" entity-id="unknown#1">
+                            <content>&lt;request-reply xmlns=&quot;http://www.mulesoft.org/schema/mule/core&quot;&gt;
+						&lt;vm:outbound-endpoint xmlns:vm=&quot;http://www.mulesoft.org/schema/mule/vm&quot; path=&quot;out&quot;&gt;
+								&lt;collection-splitter/&gt;
+						&lt;/vm:outbound-endpoint&gt;
+						&lt;vm:inbound-endpoint xmlns:vm=&quot;http://www.mulesoft.org/schema/mule/vm&quot; path=&quot;response&quot;&gt;
+							&lt;message-properties-transformer&gt;
+								&lt;add-message-property key=&quot;MULE_CORRELATION_GROUP_SIZE&quot; value=&quot;3&quot;/&gt;
+							&lt;/message-properties-transformer&gt;
+						&lt;collection-aggregator/&gt;
+						&lt;/vm:inbound-endpoint&gt;						
+				&lt;/request-reply&gt;</content>
+                        </unknown>
+                    </lane>
+                    <lane hadOnlyOneElement="true" index="20" isChoiceOtherwiseLane="true" entity-id="2b64c801-8ae0-45ba-8f38-aef74035e98b">
+                        <pattern name="Logger" type="http://www.mulesoft.org/schema/mule/core/logger" entity-id="Logger#2">
+                            <properties>
+<property name="message"/>
+<property name="level"/>
+<property name="category"/>
+<property name="auxiliary;index" value="20"/>
+<property name="auxiliary;index" value="20"/>
+<property name="auxiliary;index" value="20"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </splitter>
+        </lane>
+    </flow>
+    <flow SubFlow="false" name="processor" entity-id="e6441fee-0d01-4932-b6e5-6b1cc4dd44f1">
+        <properties>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="auxiliary;index" value="21"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="21"/>
+            <property name="auxiliary;index" value="21"/>
+            <property name="auxiliary;index" value="21"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#2">
+            <endpoint direction="Inbound" message-exchange-pattern="OneWay" name="VM" type="http://www.mulesoft.org/schema/mule/vm/endpoint" entity-id="VM#1">
+                <properties>
+                    <property name="exchange-pattern" value="one-way"/>
+                    <property name="exchange-pattern"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="path" value="out"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="address"/>
+                    <property name="responseTimeout"/>
+                    <property name="encoding"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="connector-ref"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="auxiliary;index" value="22"/>
+                    <property name="auxiliary;index" value="22"/>
+                </properties>
+            </endpoint>
+            <pattern name="sleep" type="http://www.mulesoft.org/schema/mule/core/component" entity-id="Java#2">
+                <properties>
+                    <property name="auxiliary;index" value="23"/>
+                    <property name="auxiliary;index" value="23"/>
+                    <property name="auxiliary;index" value="23"/>
+                    <property name="class" value="com.javaroots.SleepComponent"/>
+                    <property name="auxiliary;index" value="23"/>
+                    <property name="auxiliary;index" value="23"/>
+                    <property name="auxiliary;index" value="23"/>
+                </properties>
+            </pattern>
+            <endpoint direction="Outbound" message-exchange-pattern="OneWay" name="VM" type="http://www.mulesoft.org/schema/mule/vm/endpoint" entity-id="VM#2">
+                <properties>
+                    <property name="exchange-pattern" value="one-way"/>
+                    <property name="exchange-pattern"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="path" value="response"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="address"/>
+                    <property name="responseTimeout"/>
+                    <property name="encoding"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="connector-ref"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="auxiliary;index" value="24"/>
+                    <property name="auxiliary;index" value="24"/>
+                </properties>
+            </endpoint>
+        </lane>
+    </flow>
+    <description></description>
+</mule-configuration>
